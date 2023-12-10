@@ -1,0 +1,21 @@
+@startuml
+autonumber
+title Аутентификация, путь внутри приложения
+
+box Application #Application
+    participant "Filter" #DodgerBlue
+    participant "AuthenticationManager" #MediumSeaGreen
+    participant "AuthenticationProvider" #MediumPurple
+    participant "UserDetailsService" #MediumAquaMarine
+end box
+
+"Filter" -[#DodgerBlue]> "Filter": Формирование запроса аутентификации\n(Экземпляр класса реализующего Authentication)
+"Filter" -[#DodgerBlue]> "AuthenticationManager": authenticate(Authentication)
+"AuthenticationManager" -[#MediumSeaGreen]> "AuthenticationProvider": authenticate(Authentication)
+"AuthenticationProvider" -[#MediumPurple]> "UserDetailsService":loadUserByUsername(username)
+"UserDetailsService" --[#MediumAquaMarine]> "AuthenticationProvider":UserDetails
+"AuthenticationProvider" -[#MediumPurple]> "AuthenticationProvider":Обработка запроса\nаутентификации
+"AuthenticationProvider" --[#MediumPurple]> "AuthenticationManager":Authentication\n(Содержит UserDetails)
+"AuthenticationManager" --[#MediumSeaGreen]> "Filter":Authentication\n(Содержит UserDetails)
+"Filter" -[#DodgerBlue]> "Filter":Сохранение результата аутентификации\nв контексте безопасности\n(Можно использовать в других фильтрах/компонентах)
+@enduml

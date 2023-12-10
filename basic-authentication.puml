@@ -1,0 +1,19 @@
+@startuml
+autonumber
+title Basic Аутентификация при помощи фильтров "Spring Security"
+actor User #OrangeRed
+
+box Application #Application
+    participant "Spring Security" #DodgerBlue
+    participant "Spring Framework\nDispatcherServlet" #MediumSeaGreen
+end box
+
+User -[#red]> "Spring Security": <b>Get http://localhost:8080/hello.html
+"Spring Security" -[#DodgerBlue]> "Spring Security": Пользователь не аутентифицирован
+"Spring Security" --[#DodgerBlue]> User: <b>401 Unauthorized\nWWW-Authenticate:Basic Realm="my realm" (Realm - источников пользователей)
+User -[#red]> "Spring Security": <b>GET http://localhost:8080/hello.html\nAuthorization: Basic...
+"Spring Security" -[#DodgerBlue]> "Spring Security": Аутентификация пользователя
+"Spring Security" -[#DodgerBlue]> "Spring Framework\nDispatcherServlet": <b>GET http://localhost:8080/hello.html\nAuthorization: Basic...
+"Spring Framework\nDispatcherServlet" --[#MediumSeaGreen]> "Spring Security": <b>200 OK\nContent-Type: text-html\n<h1>Hello</h1
+"Spring Security" --[#DodgerBlue]> User: <b>200 OK\nContent-Type: text-html\n<h1>Hello</h1>
+@enduml

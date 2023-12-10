@@ -1,0 +1,22 @@
+@startuml
+autonumber
+title Аутентификация при помощи формы для ввода логина и пароля
+actor User #OrangeRed
+
+box Application #Application
+    participant "Spring Security" #DodgerBlue
+    participant "Spring Framework\nDispatcherServlet" #MediumSeaGreen
+end box
+
+User -[#red]> "Spring Security": <b>Get http://localhost:8080/hello.html
+"Spring Security" -[#DodgerBlue]> "Spring Security": Пользователь не аутентифицирован
+"Spring Security" --[#DodgerBlue]> User: 302 Found\nLocation: http://localhost:8080/login\nSet-Cookie:JSESSIONID=1 (Cookie анонимного пользователя)
+User -[#red]> "Spring Security": <b>POST http://localhost:8080/login\nContent-Type:application/x-www-form-urlencoded\nusername=user&password=pas
+"Spring Security" -[#DodgerBlue]> "Spring Security": Аутентификация пользователя
+"Spring Security" --[#DodgerBlue]> User: <b>302 Found Location: http://localhost:8080/hello.html\nSet-Cookie:JSESSIONID=2 (Cookie аутентифицированного пользователя)
+User -[#red]> "Spring Security": <b>Get http://localhost:8080/hello.html\nCookie:JSESSIONID=2 (Cookie аутентифицированного пользователя)
+"Spring Security" -[#DodgerBlue]> "Spring Security": Получение пользовательской сессии
+"Spring Security" -[#DodgerBlue]> "Spring Framework\nDispatcherServlet": <b>GET http://localhost:8080/hello.html
+"Spring Framework\nDispatcherServlet" --[#MediumSeaGreen]> "Spring Security": <b>200 OK\nContent-Type: text-html\n<h1>Hello</h1
+"Spring Security" --[#DodgerBlue]> User: <b>200 OK\nContent-Type: text-html\n<h1>Hello</h1>
+@enduml
