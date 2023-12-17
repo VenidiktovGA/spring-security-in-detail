@@ -1,16 +1,24 @@
 package ru.venidiktov.spring.security.detail.config;
 
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.venidiktov.spring.security.detail.service.JdbcUserDetailService;
 
 /**
  * При использовании spring-boot конфигурировать DelegatingFilterProxy не нужно, так же не нужна аннотация @EnableWebSecurity
  */
 @Configuration
 public class SecurityConfig {
+
+    @Bean
+    public UserDetailsService userDetailsService(DataSource dataSource) {
+        return new JdbcUserDetailService(dataSource);
+    }
 
     /**
      * !!! Для настройки цепочки фильтров регистрируем бин SecurityFilterChain (создать его можно из экземпляра HttpSecurity, который зарегистрирован в контексте приложения после включения поддержки Spring Security)!!!
