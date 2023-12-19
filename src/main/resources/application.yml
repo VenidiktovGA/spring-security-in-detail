@@ -1,6 +1,10 @@
-#spring.security.user.password: password # ????? ??? ???????? ????? ?????? ?????????? ?????? ??? security
+#spring.security.user.password: password # Можно задать пароль жестко для пользователя в Spring Security
 spring:
   datasource:
     url: jdbc:tc:postgresql:16:///sandbox?TC_DAEMON=true # /// тре слеша значит что хост и порт игнорируем
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
+
+#logging:
+#  level:
+#    org.springframework.security: trace
