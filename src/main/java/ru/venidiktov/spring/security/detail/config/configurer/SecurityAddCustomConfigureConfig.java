@@ -1,18 +1,22 @@
-package ru.venidiktov.spring.security.detail.config;
+package ru.venidiktov.spring.security.detail.config.configurer;
 
 import javax.sql.DataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.Customizer;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.venidiktov.spring.security.detail.configurator.MyConfigurer;
 import ru.venidiktov.spring.security.detail.service.JdbcUserDetailService;
 
 /**
  * При использовании spring-boot конфигурировать DelegatingFilterProxy не нужно, так же не нужна аннотация @EnableWebSecurity
  */
-//@Configuration
-public class SecurityConfig {
+@Slf4j
+@Configuration
+public class SecurityAddCustomConfigureConfig {
 
     @Bean
     public UserDetailsService userDetailsService(DataSource dataSource) {
@@ -28,21 +32,8 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .authorizeHttpRequests(
-                        authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                                .anyRequest().authenticated() // Запрос по любому пути должен делаться только аутентифицированными пользователями
-                );
-        /**
-         * !!! Если включить форму от Spring Security то при первой аутентификации постоянно перебрасывает на /error?continue,
-         * решил только обходным путем через перенаправление на / то-есть на index.html
-         * Таска на проблему https://github.com/spring-projects/spring-security/issues/12635
-         */
-        httpSecurity.formLogin(
-                        httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer.defaultSuccessUrl("/", true) // При удачной аутентификации всегда перенаправляем на главную страницу
-                ) // Форма входа будет использоваться по умолчанию от Spring Security
-                .httpBasic(Customizer.withDefaults()); // Включаем Basic аутентификацию
-
+        log.info("AM in config {}", httpSecurity.getSharedObject(AuthenticationManager.class));
+        httpSecurity.apply(new MyConfigurer().realmName("REALmmm")); // Кастомный realm затирается дефолтной формой аутентификации, его с ней не видно (не решил проблему)
         return httpSecurity.build();
     }
 }
