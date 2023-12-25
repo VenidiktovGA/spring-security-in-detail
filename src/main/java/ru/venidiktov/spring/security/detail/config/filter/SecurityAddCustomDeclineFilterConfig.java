@@ -1,13 +1,14 @@
-package ru.venidiktov.spring.security.detail.config.configurer;
+package ru.venidiktov.spring.security.detail.config.filter;
 
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.venidiktov.spring.security.detail.configurator.MyConfigurer;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
+import ru.venidiktov.spring.security.detail.filter.DeniedClientFilter;
 import ru.venidiktov.spring.security.detail.service.JdbcUserDetailService;
 
 /**
@@ -15,7 +16,7 @@ import ru.venidiktov.spring.security.detail.service.JdbcUserDetailService;
  */
 @Slf4j
 //@Configuration
-public class SecurityAddCustomConfigureConfig {
+public class SecurityAddCustomDeclineFilterConfig {
 
     @Bean
     public UserDetailsService userDetailsService(DataSource dataSource) {
@@ -31,8 +32,11 @@ public class SecurityAddCustomConfigureConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        log.info("AM in config {}", httpSecurity.getSharedObject(AuthenticationManager.class));
-        httpSecurity.apply(new MyConfigurer().realmName("REALmmm")); // Кастомный realm затирается дефолтной формой аутентификации, его с ней не видно (не решил проблему)
+        httpSecurity.addFilterBefore(new DeniedClientFilter(), DisableEncodeUrlFilter.class) // Добавили свой фильтр перед DisableEncodeUrlFilter
+                .httpBasic(Customizer.withDefaults())
+                .authorizeHttpRequests(authorizationManagerRequestMatcher ->
+                        authorizationManagerRequestMatcher.requestMatchers("/error").permitAll()
+                                .anyRequest().authenticated());
         return httpSecurity.build();
     }
 }
